@@ -1,4 +1,5 @@
 ;(function(exports){
+// -- Popbox by otarim
 // -- show(timeout)  ---close(timeout) 
 function preventDefault(e){
 	e = window.event || e;
