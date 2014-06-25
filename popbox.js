@@ -1,4 +1,5 @@
 ;(function(exports){
+// -- show(timeout)  ---close(timeout) 
 function preventDefault(e){
 	e = window.event || e;
 	e.preventDefault ? e.preventDefault() : e.returnValue = false;
@@ -34,7 +35,7 @@ var addEvent = (function() {
 		}
 	}
 	var bindEvent = function(el,type,callback,rpk){
-		var _callback = callback,canbubble = false,
+		var _callback = callback,useCapture = false,
 			target,_type;
 		if(type === 'mouseenter' || type === 'mouseleave'){
 			_type = type;
@@ -55,16 +56,16 @@ var addEvent = (function() {
 			});
 		}
 		if(type === 'blur' || type === 'focus'){
-			canbubble = true;
+			useCapture = true;
 			type = specialTypes[type];
 		}
-		return rpk.call(el,type,callback,canbubble);
+		return rpk.call(el,type,callback,useCapture);
 		
 	}
 	if (typeof addEventListener === 'function') {
 		return function(el, type, callback) {
-			bindEvent(el, type, callback,function(type,callback,canbubble){
-				return el.addEventListener(type, callback, canbubble);
+			bindEvent(el, type, callback,function(type,callback,useCapture){
+				return el.addEventListener(type, callback, useCapture);
 			});
 		}
 	} else {
@@ -78,7 +79,7 @@ var addEvent = (function() {
 
 var removeEvent = (function(){
 	var digCallback = function(el,type,callback,rpk){
-		var hub,_type,canbubble = false;
+		var hub,_type,useCapture = false;
 		if(type === 'mouseenter' || type === 'mouseleave'){
 			hub = eventHub[type];
 			_type = type;
@@ -91,15 +92,15 @@ var removeEvent = (function(){
 			}
 		}
 		if(type === 'blur' || type === 'focus'){
-			canbubble = true;
+			useCapture = true;
 			type = specialTypes[type];
 		}
-		return rpk.call(el,type,callback,canbubble);
+		return rpk.call(el,type,callback,useCapture);
 	}
 	if (typeof removeEventListener === 'function') {
 		return function(el, type, callback) {
-			digCallback(el,type,callback,function(type,callback,canbubble){
-				return el.removeEventListener(type,callback,canbubble);
+			digCallback(el,type,callback,function(type,callback,useCapture){
+				return el.removeEventListener(type,callback,useCapture);
 			})
 		}
 	} else {
@@ -169,6 +170,9 @@ Popbox.prototype = {
 		this.ieFix();
 		return this;
 	},
+	remove: function(){
+		document.body.removeChild(this.el);
+	},	
 	ieFix: function(){
 		// 隐藏元素拿不到 layout
 		var offX,offY;
