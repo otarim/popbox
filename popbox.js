@@ -1,6 +1,6 @@
 ;(function(exports){
 // -- Popbox by otarim
-// -- show(timeout)  ---close(timeout) 
+// todo: show(timeout)  ---close(timeout) 
 function preventDefault(e){
 	e = window.event || e;
 	e.preventDefault ? e.preventDefault() : e.returnValue = false;
@@ -118,10 +118,11 @@ function Popbox(config){
 	var defaultEvent = {
 		'click#popClose': this.close
 	};
-	this.events = Popbox.merge(config.events,defaultEvent) || defaultEvent;
+	this.events = config && config.events && Popbox.merge(defaultEvent,config.events) || defaultEvent;
 	wrap.className = 'popbox-container_';
-	wrap.style.cssText += ';display: none';
-	wrap.innerHTML = (config.el && config.el.call(this,this.el)) || '';
+	wrap.style.cssText += ';position: fixed;_position: absolute;top: 50%;left: 50%;-webkit-transform: translate(-50%,-50%);-moz-transform: translate(-50%,-50%);-o-transform: translate(-50%,-50%);-ms-transform: translate(-50%,-50%);transform: translate(-50%,-50%);display: none';
+	config.style && (wrap.style.cssText += Popbox.coStyle(config.style));
+	wrap.innerHTML = config && config.el && config.el.call(this,this.el) || '';
 	document.body.insertBefore(wrap, document.body.firstChild);
 	this.bind();
 }
@@ -135,8 +136,19 @@ Popbox.merge = function(obj,target){
 	return obj;
 }
 
+Popbox.coStyle = function(styleList){
+	var ret = [';'];
+	for(var i in styleList){
+		if(styleList.hasOwnProperty(i)){
+			ret.push(i + ':' + styleList[i]);
+		}
+	}
+	return ret.join(';')
+}
+
 Popbox.prototype = {
-	reDraw: function(callback){
+	reDraw: function(callback,styleObj){
+		styleObj && (this.el.style.cssText += Popbox.coStyle(styleObj));
 		this.el.innerHTML = callback.call(this,this.el);
 		this.ieFix();
 		return this;
@@ -147,7 +159,6 @@ Popbox.prototype = {
 		for(var i in eventList){
 			if(eventList.hasOwnProperty(i)){
 				(function(i){
-					// global....wtf
 					var customEvent = i.split('#');
 					var callback = function(e){
 						e = window.event || e;
@@ -184,8 +195,5 @@ Popbox.prototype = {
 		}
 	}
 }
-exports.preventDefault = preventDefault;
-exports.setData = setData;
-exports.getData = getData;
 exports.Popbox = Popbox;
 })(window)

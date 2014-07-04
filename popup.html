@@ -5,13 +5,7 @@
 	<title>Document</title>
 	<style>
 	* {margin: 0;padding: 0;}
-	.popbox-container_ {position: fixed;_position: absolute;top: 50%;left: 50%;z-index: 15;width: 350px;border: 1px solid #909090;background: #fff;
-		font-size: 14px;
-		-webkit-transform: translate(-50%,-50%);
-		-moz-transform: translate(-50%,-50%);
-		-o-transform: translate(-50%,-50%);
-		-ms-transform: translate(-50%,-50%);
-	}
+	.popbox-container_ {background: #fff;font-size: 14px;z-index: 15;}
 	.pop-header {height: 30px;background: #fff;border-bottom: 1px solid #cdcdcd;text-align: right;}
 	.pop-header strong {float: left;padding-left: 14px;font-size: 14px;line-height: 28px;font-family: 微软雅黑;}
 	.pop-header-close,.pop-section-ico {background: url(http://www1.pcauto.com.cn/cmt/2013/images/cmtIcon.png) no-repeat;}
@@ -29,9 +23,23 @@
 </body>
 <script src="popbox.js"></script>
 <script>
+	// --custom helper
+	function preventDefault(e){
+		e = window.event || e;
+		e.preventDefault ? e.preventDefault() : e.returnValue = false;
+		return true;
+	}
+	function getData(el, property) {
+		return 'dataset' in el ? el.dataset[property] : el.getAttribute('data-' + property);
+	}
+	
 	var pop = new Popbox({
 		el: function(){
 			return '<div class="pop-section">2秒之后我变</div>';
+		},
+		style: {
+			width: '500px',
+			border: '1px solid red'
 		},
 		events: {
 			'click#popAsync': function(e,el){
@@ -42,6 +50,10 @@
 			'click#popCancle': function(e,el){
 				preventDefault(e);
 				this.close();
+			},
+			'click#popClose': function(e,el){
+				preventDefault(e);
+				this.remove();
 			}
 		}
 	}).show();
@@ -51,6 +63,11 @@
 			'<div class="pop-section">'+
 				'<p><input type="text" data-event="checkempty" data-name="名字" placeholder="名字"><span></span><p><input type="password" data-event="checkempty" data-name="密码"  placeholder="密码"><span></span>'+
 			'</div>'
+		},
+		style: {
+			width: '600px',
+			'text-align': 'center',
+			border: '1px solid #909090'
 		},
 		events: {
 			'blur#checkempty': function(e,el){
@@ -68,6 +85,9 @@
 						'<div class="pop-section">您的账号还没与账号进行绑定，是否现在进行绑定？</div>' +
 						'<div class="pop-footer"><a href="javascript:;" class="pop-footer-async" data-event="popAsync">确定</a><a href="http://www.baidu.com" class="pop-footer-cancle" data-event="popCancle">取消</a></div>'	
 			return tpl;
+		},{
+			width: '350px',
+			border: '1px solid #909090'
 		}).show();
 	},2000)
 </script>
