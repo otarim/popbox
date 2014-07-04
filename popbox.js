@@ -121,7 +121,7 @@ function Popbox(config){
 	this.events = config && config.events && Popbox.merge(defaultEvent,config.events) || defaultEvent;
 	wrap.className = 'popbox-container_';
 	wrap.style.cssText += ';position: fixed;_position: absolute;top: 50%;left: 50%;-webkit-transform: translate(-50%,-50%);-moz-transform: translate(-50%,-50%);-o-transform: translate(-50%,-50%);-ms-transform: translate(-50%,-50%);transform: translate(-50%,-50%);display: none';
-	config.style && (wrap.style.cssText += Popbox.coStyle(config.style));
+	config && config.style && (wrap.style.cssText += Popbox.coStyle(config.style));
 	wrap.innerHTML = config && config.el && config.el.call(this,this.el) || '';
 	document.body.insertBefore(wrap, document.body.firstChild);
 	this.bind();
