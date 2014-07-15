@@ -20,6 +20,7 @@
 	</style>
 </head>
 <body>
+	<a href="javascript:;" id="showPop">吸附窗体</a>
 </body>
 <script src="popbox.js"></script>
 <script>
@@ -61,7 +62,7 @@
 		el: function(){
 			return '<div class="pop-header"><strong>提示</strong><a href="javascript:;" class="pop-header-close" data-event="popClose">x</a></div>'+
 			'<div class="pop-section">'+
-				'<p><input type="text" data-event="checkempty" data-name="名字" placeholder="名字"><span></span><p><input type="password" data-event="checkempty" data-name="密码"  placeholder="密码"><span></span>'+
+				'<p><input type="text" data-event="checkempty,checkLen" data-name="名字" placeholder="名字"><span></span><p><input type="password" data-event="checkempty" data-name="密码"  placeholder="密码"><span></span>'+
 			'</div>'
 		},
 		style: {
@@ -76,9 +77,34 @@
 				}else{
 					el.nextSibling.innerHTML = '';
 				}
+			},
+			'keyup#checkLen': function(e,el){
+				clearTimeout(this.timmer);
+				this.timmer = setTimeout(function(){
+					console.log(el.value.length)
+				},500)
 			}
 		}
 	})
+	var pop3 = new Popbox({
+		type: 'tip',
+		direction: 'bottom',
+		el: function(){
+			return '<div>hello<span data-event="popClose"> x </span></div>'
+		},
+		style: {
+			width: '100px',
+			height: '50px',
+			'text-align': 'center',
+			color: 'red'
+		}
+	})
+	document.getElementById('showPop').onclick = function(e){
+		pop3.show(e,{
+			border: '1px solid red',
+			'line-height': '50px'
+		});
+	}
 	setTimeout(function(){
 		pop.reDraw(function(){
 			var tpl = '<div class="pop-header"><strong>提示</strong><a href="javascript:;" class="pop-header-close" data-event="popClose">x</a></div>'+

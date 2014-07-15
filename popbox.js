@@ -121,7 +121,7 @@ function Popbox(config){
 	this.events = config && config.events && Popbox.merge(defaultEvent,config.events) || defaultEvent;
 	wrap.className = 'popbox-container_';
 	wrap.style.cssText += ';position: fixed;_position: absolute;top: 50%;left: 50%;-webkit-transform: translate(-50%,-50%);-moz-transform: translate(-50%,-50%);-o-transform: translate(-50%,-50%);-ms-transform: translate(-50%,-50%);transform: translate(-50%,-50%);display: none';
-	config && config.style && (wrap.style.cssText += Popbox.coStyle(config.style));
+	config.style && (wrap.style.cssText += Popbox.coStyle(config.style));
 	wrap.innerHTML = config && config.el && config.el.call(this,this.el) || '';
 	document.body.insertBefore(wrap, document.body.firstChild);
 	this.bind();
@@ -156,6 +156,21 @@ Popbox.prototype = {
 	bind: function(){
 		var eventList = this.events,
 			self = this;
+		var getEventList = function(target){
+			return getData(target,'event') && getData(target,'event').split(',') || [];
+		}
+		var matchEvent = function(eventType,eventName){
+			if(typeof [].indexOf === 'function'){
+				return eventType.indexOf(eventName) !== -1
+			}else{
+				for(var i = 0,l = eventType.length;i < l;i++){
+					if(eventType[i] === eventName){
+						return true;
+					}
+				}	
+				return false;
+			}
+		}
 		for(var i in eventList){
 			if(eventList.hasOwnProperty(i)){
 				(function(i){
@@ -163,8 +178,8 @@ Popbox.prototype = {
 					var callback = function(e){
 						e = window.event || e;
 						var target = e.srcElement || e.target,
-							eventType = getData(target,'event');
-						if(eventType === customEvent[1]){
+							eventType = getEventList(target);
+						if(matchEvent(eventType,customEvent[1])){
 							eventList[i].call(self,e,target);
 						}
 					}
@@ -186,7 +201,7 @@ Popbox.prototype = {
 		document.body.removeChild(this.el);
 	},	
 	ieFix: function(){
-		// éšè—å…ƒç´ æ‹¿ä¸åˆ° layout
+		// Òþ²ØÔªËØÄÃ²»µ½ layout
 		var offX,offY;
 		if(!-[1,]){
 			offX = -this.el.offsetWidth / 2 + 'px';

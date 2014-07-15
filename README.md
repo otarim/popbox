@@ -6,7 +6,7 @@
 
 	var pop = new Popbox({
 		el: function(){
-			return '<div class="pop-section">hello world <em data-event="popByebye">click to change it~</em></div>';
+			return '<div class="pop-section">hello world <em data-event="popByebye,logMessage">click to change it~</em></div>';
 		},
 		style: {
 			width: '350px'
@@ -16,6 +16,9 @@
 				this.reDraw(function(){
 					return '<p data-event="popClose">bye~(click to close me)</p>'
 				},{color: red})
+			},
+			'click#logMessage': function(){
+				console.log('#$@');
 			}
 		}
 	}).show();
@@ -56,3 +59,7 @@
 *ieFix*
 
 	用于修复 ie 居中
+	
+##update log
+
+1. 140715add: 现在支持多事件绑定到同一个元素上面了。
