@@ -201,7 +201,6 @@ Popbox.prototype = {
 		document.body.removeChild(this.el);
 	},	
 	ieFix: function(){
-		// Òþ²ØÔªËØÄÃ²»µ½ layout
 		var offX,offY;
 		if(!-[1,]){
 			offX = -this.el.offsetWidth / 2 + 'px';
