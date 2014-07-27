@@ -6,16 +6,19 @@
 
 	var pop = new Popbox({
 		el: function(){
-			return '<div class="pop-section">hello world <em data-event="popByebye,logMessage">click to change it~</em></div>';
+			return '<div class="pop-section" data-event="popDrag">hello world <em data-event="popByebye,logMessage">click to change it~</em></div>';
 		},
+		overlay: true,
+		dragable: true,
 		style: {
-			width: '350px'
+			width: '350px',
+			padding: '20px 50px'
 		},
 		events: {
 			'click#popByebye': function(e,el){
 				this.reDraw(function(){
 					return '<p data-event="popClose">bye~(click to close me)</p>'
-				},{color: red})
+				},{color: 'red'})
 			},
 			'click#logMessage': function(){
 				console.log('#$@');
@@ -43,6 +46,14 @@
 **style**
 
 	指定最外层container的样式
+
+**overlay**
+
+	是否需要遮罩
+
+**dragable**
+
+	是否可以拖动
 	
 **close**
 
@@ -56,10 +67,7 @@
 
 	从 dom 节点删除弹窗
 	
-*ieFix*
-
-	用于修复 ie 居中
-	
 ##update log
 
-1. 140715add: 现在支持多事件绑定到同一个元素上面了。
+1. 140715add: 现在支持多事件绑定到同一个元素上面了。(用逗号`,`分隔事件);
+2. 140727add: 增加遮罩层以及是否可拖动选择。(当`dragable`为`true`时，需要在可拖动元素上面添加`data-event="popDrag"`);
