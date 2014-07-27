@@ -1,6 +1,5 @@
 ;(function(exports){
 // -- Popbox by otarim
-// todo: show(timeout)  ---close(timeout) 
 function preventDefault(e){
 	e = window.event || e;
 	e.preventDefault ? e.preventDefault() : e.returnValue = false;
@@ -112,22 +111,8 @@ var removeEvent = (function(){
 		}
 	}
 })();
-function Popbox(config){
-	// default layout
-	var wrap = this.el = document.createElement('div');
-	var defaultEvent = {
-		'click#popClose': this.close
-	};
-	this.events = config && config.events && Popbox.merge(defaultEvent,config.events) || defaultEvent;
-	wrap.className = 'popbox-container_';
-	wrap.style.cssText += ';position: fixed;_position: absolute;top: 50%;left: 50%;-webkit-transform: translate(-50%,-50%);-moz-transform: translate(-50%,-50%);-o-transform: translate(-50%,-50%);-ms-transform: translate(-50%,-50%);transform: translate(-50%,-50%);display: none';
-	config && config && config.style && (wrap.style.cssText += Popbox.coStyle(config.style));
-	wrap.innerHTML = config && config.el && config.el.call(this,this.el) || '';
-	document.body.insertBefore(wrap, document.body.firstChild);
-	this.bind();
-}
 
-Popbox.merge = function(obj,target){
+var merge = function(obj,target){
 	for(var i in target){
 		if(target.hasOwnProperty(i)){
 			obj[i] = target[i];
@@ -136,7 +121,7 @@ Popbox.merge = function(obj,target){
 	return obj;
 }
 
-Popbox.coStyle = function(styleList){
+var coStyle = function(styleList){
 	var ret = [';'];
 	for(var i in styleList){
 		if(styleList.hasOwnProperty(i)){
@@ -146,11 +131,36 @@ Popbox.coStyle = function(styleList){
 	return ret.join(';')
 }
 
+var addPrefix = function(property,value){
+	var prefix = ['-webkit-','-moz-','-ms-','-o-',''],ret = [];
+	for(var i = 0;i<prefix.length;i++){
+		ret.push(prefix[i] + property + ':' + value);
+	}
+	return ret.join(';');
+}
+
+function Popbox(config){
+	var wrap = this.el = document.createElement('div');
+	var defaultEvent = {
+		'click#popClose': this.close
+	};
+	this.config = config || {};
+	this.config.dragable && this.bindDragEvent(defaultEvent);
+	this.events = this.config.events && merge(defaultEvent,config.events) || defaultEvent;
+	wrap.className = 'popbox-container_';
+	wrap.style.cssText += ';position: fixed;_position: absolute;display: none;top: 50%;left: 50%;';
+	this.config.style && (wrap.style.cssText += coStyle(config.style));
+	wrap.innerHTML = this.config.el && config.el.call(this,this.el) || '';
+	document.body.insertBefore(wrap, document.body.firstChild);
+	this.config.overlay && this.buildOverlay();
+	this.bind();
+}
+
 Popbox.prototype = {
 	reDraw: function(callback,styleObj){
-		styleObj && (this.el.style.cssText += Popbox.coStyle(styleObj));
+		styleObj && (this.el.style.cssText += coStyle(styleObj));
 		this.el.innerHTML = callback.call(this,this.el);
-		this.ieFix();
+		this.layoutFix();
 		return this;
 	},
 	bind: function(){
@@ -189,23 +199,63 @@ Popbox.prototype = {
 		}
 	},
 	close: function(){
+		this.toggleOverlay(false);
 		this.el.style.cssText += ';display: none;';
 		return this;
 	},
 	show: function(){
+		this.toggleOverlay(true);
 		this.el.style.cssText += ';display: block;';
-		this.ieFix();
+		this.layoutFix();
 		return this;
 	},
 	remove: function(){
 		document.body.removeChild(this.el);
-	},	
-	ieFix: function(){
+		document.body.removeChild(this.overlayEl);
+	},
+	buildOverlay: function(){
+		var overlay;
+		this.overlayEl = overlay = document.createElement('div');
+		overlay.style.cssText += ';position: absolute;display: none;width: 100%;height: 100%;top: 0;left: 0;background: #000;filter: alpha(opacity=50);opacity: .5;';
+		document.body.insertBefore(overlay, document.body.firstChild);
+	},
+	toggleOverlay: function(show){
+		if(this.overlayEl){
+			if(show === true){
+				this.overlayEl.style.cssText += ';display: block';
+			}else{
+				this.overlayEl.style.cssText += ';display: none';
+			}
+		}
+	},
+	bindDragEvent: function(defaultEvent){
+		var self = this;
+		var dragEventFn = function(e,target){
+			var elStyle = this.el.style,
+				elTop = this.el.offsetTop,
+				elLeft = this.el.offsetLeft;
+			var beginPos = {x: e.pageX || e.clientX,y: e.pageY || e.clientY},endPos = {};
+			elStyle['marginLeft'] = elStyle['marginTop'] = '';
+			elStyle.cssText += ';top: ' + elTop + 'px;left: ' + elLeft + 'px;';
+			document.onmousemove = function(e){
+				e = window.event || e;
+				endPos = {x: e.pageX || e.clientX,y: e.pageY || e.clientY};
+				elStyle.cssText += ';top: ' +( elTop + endPos.y - beginPos.y) + 'px;left: ' + (elLeft + endPos.x - beginPos.x)+ 'px;';
+			}
+			document.onmouseup = function(){
+				document.onmouseup = document.onmousemove = document.onselect = null;
+			}
+		}
+		defaultEvent['mousedown#popDrag'] = dragEventFn;
+	},
+	layoutFix: function(){
 		var offX,offY;
-		if(!-[1,]){
+		if(!-[1,] || this.config.dragable){
 			offX = -this.el.offsetWidth / 2 + 'px';
 			offY = -this.el.offsetHeight / 2 + 'px';
 			this.el.style.cssText += ';margin-top: ' + offY + ';margin-left: ' + offX;
+		}else{
+			this.el.style.cssText += addPrefix('transform','translate(-50%,-50%)');
 		}
 	}
 }

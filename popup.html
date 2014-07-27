@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+	<!--[if IE 6]><script>document.execCommand("BackgroundImageCache", false, true)</script><![endif]-->
 	<title>Document</title>
 	<style>
 	* {margin: 0;padding: 0;}
+	body {width: 100%;height: 100%;}
 	.popbox-container_ {background: #fff;font-size: 14px;z-index: 15;}
 	.pop-header {height: 30px;background: #fff;border-bottom: 1px solid #cdcdcd;text-align: right;}
 	.pop-header strong {float: left;padding-left: 14px;font-size: 14px;line-height: 28px;font-family: 微软雅黑;}
@@ -20,7 +22,7 @@
 	</style>
 </head>
 <body>
-	<a href="javascript:;" id="showPop">吸附窗体</a>
+	<!-- <a href="javascript:;" id="showPop">吸附窗体</a> -->
 </body>
 <script src="popbox.js"></script>
 <script>
@@ -33,11 +35,12 @@
 	function getData(el, property) {
 		return 'dataset' in el ? el.dataset[property] : el.getAttribute('data-' + property);
 	}
-	
 	var pop = new Popbox({
 		el: function(){
 			return '<div class="pop-section">2秒之后我变</div>';
 		},
+		overlay: true,
+		dragable: true,
 		style: {
 			width: '500px',
 			border: '1px solid red'
@@ -86,28 +89,28 @@
 			}
 		}
 	})
-	var pop3 = new Popbox({
-		type: 'tip',
-		direction: 'bottom',
-		el: function(){
-			return '<div>hello<span data-event="popClose"> x </span></div>'
-		},
-		style: {
-			width: '100px',
-			height: '50px',
-			'text-align': 'center',
-			color: 'red'
-		}
-	})
-	document.getElementById('showPop').onclick = function(e){
-		pop3.show(e,{
-			border: '1px solid red',
-			'line-height': '50px'
-		});
-	}
+	// var pop3 = new Popbox({
+	// 	type: 'tip',
+	// 	direction: 'bottom',
+	// 	el: function(){
+	// 		return '<div>hello<span data-event="popClose"> x </span></div>'
+	// 	},
+	// 	style: {
+	// 		width: '100px',
+	// 		height: '50px',
+	// 		'text-align': 'center',
+	// 		color: 'red'
+	// 	}
+	// })
+	// document.getElementById('showPop').onclick = function(e){
+	// 	pop3.show(e,{
+	// 		border: '1px solid red',
+	// 		'line-height': '50px'
+	// 	});
+	// }
 	setTimeout(function(){
 		pop.reDraw(function(){
-			var tpl = '<div class="pop-header"><strong>提示</strong><a href="javascript:;" class="pop-header-close" data-event="popClose">x</a></div>'+
+			var tpl = '<div class="pop-header" data-event="popDrag"><strong>提示</strong><a href="javascript:;" class="pop-header-close" data-event="popClose">x</a></div>'+
 						'<div class="pop-section">您的账号还没与账号进行绑定，是否现在进行绑定？</div>' +
 						'<div class="pop-footer"><a href="javascript:;" class="pop-footer-async" data-event="popAsync">确定</a><a href="http://www.baidu.com" class="pop-footer-cancle" data-event="popCancle">取消</a></div>'	
 			return tpl;
