@@ -278,7 +278,7 @@
 		},
 		remove: function() {
 			document.body.removeChild(this.el);
-			document.body.removeChild(this.overlayEl);
+			this.overlayEl && document.body.removeChild(this.overlayEl);
 		},
 		buildOverlay: function() {
 			this.overlayEl = overlay = document.createElement('div');
