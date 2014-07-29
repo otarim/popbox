@@ -50,7 +50,25 @@
 			'click#popAsync': function(e,el){
 				preventDefault(e);
 				// this.close();
-				pop2.show();
+				// pop2.show();
+				for(var i = 0;i<3;i++){
+					new Popbox({
+						el: function(){
+							return '<div class="pop-header" data-event="popDrag"><strong>提示</strong><a href="javascript:;" class="pop-header-close" data-event="popClose">x</a></div>'+
+									'<div class="pop-section">'+
+										'<p><input type="text" data-event="checkempty,checkLen" data-name="名字" placeholder="名字"><span></span><p><input type="password" data-event="checkempty" data-name="密码"  placeholder="密码"><span></span>'+
+									'</div>'
+						},
+						dragable: true,
+						overlay: false,
+						style: {
+							width: '400px',
+							height: '200px',
+							background: '#fff',
+							border: '1px solid #909090'
+						}
+					}).show();
+				}
 			},
 			'click#popCancle': function(e,el){
 				preventDefault(e);
