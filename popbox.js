@@ -1,5 +1,7 @@
 ;(function(exports){
 // -- Popbox by otarim
+// todo multipy overlay Superposition
+// todo use shortcut esc
 function preventDefault(e){
 	e = window.event || e;
 	e.preventDefault ? e.preventDefault() : e.returnValue = false;
@@ -139,20 +141,33 @@ var addPrefix = function(property,value){
 	return ret.join(';');
 }
 
+var getDocumentLayout = function(){
+	return {
+		docWidth : document.documentElement.scrollWidth || document.body.scrollWidth,
+		docHeight : document.documentElement.scrollHeight || document.body.scrollHeight
+	}
+}
+
+var overlayIndex = popMaxzIndex = 9998;
+
 function Popbox(config){
 	var wrap = this.el = document.createElement('div');
+	var self = this;
 	var defaultEvent = {
-		'click#popClose': this.close
+		'click#popClose': function(e,el){
+			self.close();
+		}
 	};
+	this.zIndex = ++popMaxzIndex;
 	this.config = config || {};
 	this.config.dragable && this.bindDragEvent(defaultEvent);
 	this.events = this.config.events && merge(defaultEvent,config.events) || defaultEvent;
 	wrap.className = 'popbox-container_';
-	wrap.style.cssText += ';position: fixed;_position: absolute;display: none;top: 50%;left: 50%;';
+	wrap.style.cssText += ';position: fixed;_position: absolute;display: none;top: 50%;left: 50%;z-index: ' + this.zIndex;
 	this.config.style && (wrap.style.cssText += coStyle(config.style));
 	wrap.innerHTML = this.config.el && config.el.call(this,this.el) || '';
 	document.body.insertBefore(wrap, document.body.firstChild);
-	this.config.overlay && this.buildOverlay();
+	this.config.overlay !== false && this.buildOverlay();
 	this.bind();
 }
 
@@ -198,15 +213,17 @@ Popbox.prototype = {
 			}
 		}
 	},
-	close: function(){
+	close: function(callback){
 		this.toggleOverlay(false);
 		this.el.style.cssText += ';display: none;';
+		callback && callback.call(this);
 		return this;
 	},
-	show: function(){
+	show: function(callback){
 		this.toggleOverlay(true);
 		this.el.style.cssText += ';display: block;';
 		this.layoutFix();
+		callback && callback.call(this);
 		return this;
 	},
 	remove: function(){
@@ -214,15 +231,20 @@ Popbox.prototype = {
 		document.body.removeChild(this.overlayEl);
 	},
 	buildOverlay: function(){
-		var overlay;
 		this.overlayEl = overlay = document.createElement('div');
-		overlay.style.cssText += ';position: absolute;display: none;width: 100%;height: 100%;top: 0;left: 0;background: #000;filter: alpha(opacity=50);opacity: .5;';
+		overlay.style.cssText += ';position: absolute;display: none;width: '+ getDocumentLayout().docWidth +'px;height: '+ getDocumentLayout().docHeight +'px;top: 0;left: 0;background: #000;filter: alpha(opacity=50);opacity: .5;z-index: ' + overlayIndex;
+		// overlay.style.cssText += ';position: absolute;display: none;top: 0;left: 0;right: 0;bottom: 0;background: #000;filter: alpha(opacity=50);opacity: .5;';
 		document.body.insertBefore(overlay, document.body.firstChild);
 	},
 	toggleOverlay: function(show){
+		var self = this;
+		var resizeOverlay = function(){
+			self.overlayEl.style.cssText += ';width: '+ getDocumentLayout().docWidth +'px;height: '+ getDocumentLayout().docHeight +'px';
+		}
 		if(this.overlayEl){
 			if(show === true){
 				this.overlayEl.style.cssText += ';display: block';
+				resizeOverlay();
 			}else{
 				this.overlayEl.style.cssText += ';display: none';
 			}
@@ -253,7 +275,7 @@ Popbox.prototype = {
 		if(!-[1,] || this.config.dragable){
 			offX = -this.el.offsetWidth / 2 + 'px';
 			offY = -this.el.offsetHeight / 2 + 'px';
-			this.el.style.cssText += ';margin-top: ' + offY + ';margin-left: ' + offX;
+			this.el.style.cssText += ';top: 50%;left: 50%;margin-top: ' + offY + ';margin-left: ' + offX;
 		}else{
 			this.el.style.cssText += addPrefix('transform','translate(-50%,-50%)');
 		}
