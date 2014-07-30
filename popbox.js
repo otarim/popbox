@@ -1,7 +1,6 @@
 ;
 (function(exports) {
 	// -- Popbox by otarim
-	// todo multipy overlay Superposition
 	function preventDefault(e) {
 		e = window.event || e;
 		e.preventDefault ? e.preventDefault() : e.returnValue = false;
@@ -149,6 +148,13 @@
 		return {
 			docWidth: document.documentElement.scrollWidth || document.body.scrollWidth,
 			docHeight: document.documentElement.scrollHeight || document.body.scrollHeight
+		}
+	}
+
+	var getViewLayout = function() {
+		return {
+			width: document.documentElement.scrollLeft + document.documentElement.clientWidth / 2,
+			height: document.documentElement.scrollTop + document.documentElement.clientHeight / 2
 		}
 	}
 
@@ -331,7 +337,12 @@
 			if (!-[1, ] || this.config.dragable) {
 				offX = -this.el.offsetWidth / 2 + 'px';
 				offY = -this.el.offsetHeight / 2 + 'px';
-				this.el.style.cssText += ';top: 50%;left: 50%;margin-top: ' + offY + ';margin-left: ' + offX;
+				if (!-[1, ] && !window.XDomainRequest) {
+					this.el.style.cssText += ';top: ' + getViewLayout().height + 'px;left: ' + getViewLayout().width + 'px;';
+				} else {
+					this.el.style.cssText += ';top: 50%;left: 50%;';
+				}
+				this.el.style.cssText += ';margin-top: ' + offY + ';margin-left: ' + offX;
 			} else {
 				this.el.style.cssText += addPrefix('transform', 'translate(-50%,-50%)');
 			}
