@@ -162,7 +162,11 @@
 
 	var instances = [];
 
+	var overlays = [];
+
 	var hasBindShortcut = false;
+
+	var hasBindResize = false;
 
 	function Popbox(config) {
 		var wrap = this.el = document.createElement('div');
@@ -288,21 +292,30 @@
 		},
 		buildOverlay: function() {
 			this.overlayEl = overlay = document.createElement('div');
+			overlays.push(overlay);
 			overlay.style.cssText += ';position: absolute;display: none;width: ' + getDocumentLayout().docWidth + 'px;height: ' + getDocumentLayout().docHeight + 'px;top: 0;left: 0;background: #000;filter: alpha(opacity=50);opacity: .5;z-index: ' + overlayIndex;
 			document.body.insertBefore(overlay, document.body.firstChild);
 		},
 		toggleOverlay: function(show) {
 			var self = this;
-			var resizeOverlay = function() {
-				self.overlayEl.style.cssText += ';width: ' + getDocumentLayout().docWidth + 'px;height: ' + getDocumentLayout().docHeight + 'px';
+			var resizeOverlay = function(el) {
+				el.style.cssText += ';width: ' + getDocumentLayout().docWidth + 'px;height: ' + getDocumentLayout().docHeight + 'px';
 			}
 			if (this.overlayEl) {
 				if (show === true) {
 					this.overlayEl.style.cssText += ';display: block';
-					resizeOverlay();
+					resizeOverlay(this.overlayEl);
 				} else {
 					this.overlayEl.style.cssText += ';display: none';
 				}
+			}
+			if(!hasBindResize){
+				hasBindResize = true;
+				addEvent(window,'resize',function(){
+					for(var i = 0;i<overlays.length;i++){
+						resizeOverlay(overlays[i]);
+					}
+				})
 			}
 		},
 		bindDragEvent: function(defaultEvent) {
