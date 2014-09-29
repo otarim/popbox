@@ -274,14 +274,15 @@
 			}
 		},
 		close: function(callback) {
+			// cssText += ';display..' cannot hide select element in ie6
 			this.toggleOverlay(false);
-			this.el.style.cssText += ';display: none;';
+			this.el.style.display = 'none';
 			callback && callback.call(this);
 			return this;
 		},
 		show: function(callback) {
 			this.toggleOverlay(true);
-			this.el.style.cssText += ';display: block;';
+			this.el.style.display = 'block';
 			this.layoutFix();
 			callback && callback.call(this);
 			return this;
@@ -309,10 +310,10 @@
 					this.overlayEl.style.cssText += ';display: none';
 				}
 			}
-			if(!hasBindResize){
+			if (!hasBindResize) {
 				hasBindResize = true;
-				addEvent(window,'resize',function(){
-					for(var i = 0;i<overlays.length;i++){
+				addEvent(window, 'resize', function() {
+					for (var i = 0; i < overlays.length; i++) {
 						resizeOverlay(overlays[i]);
 					}
 				})
