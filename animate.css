@@ -1,0 +1,76 @@
+.ui-animate-bounceIn { display: block !important; -webkit-animation: bounceIn .2s linear; -o-animation: bounceIn .2s linear; -moz-animation: bounceIn .2s linear; animation: bounceIn .2s linear; }
+@-webkit-keyframes bounceIn {
+	0% { -webkit-transform: scale(.5); opacity: 0; }
+	70% { -webkit-transform: scale(1.03); }
+	100% { -webkit-transform: scale(1); }
+}
+@-o-keyframes bounceIn {
+	0% { -o-transform: scale(.5); opacity: 0; }
+	70% { -o-transform: scale(1.03); }
+	100% { -o-transform: scale(1); }
+}
+@-moz-keyframes bounceIn {
+	0% { -moz-transform: scale(.5); opacity: 0; }
+	70% { -moz-transform: scale(1.03); }
+	100% { -moz-transform: scale(1); }
+}
+@keyframes bounceIn {
+	0% { transform: scale(.5); opacity: 0; }
+	70% { transform: scale(1.03); }
+	100% { transform: scale(1); }
+}
+.ui-animate-bounceOut { -webkit-animation: bounceOut .2s linear; -o-animation: bounceOut .2s linear; animation: bounceOut .2s linear; }
+@-webkit-keyframes bounceOut {
+	0% { -webkit-transform: scale(1); }
+	70% { -webkit-transform: scale(1.03); }
+	100% { -webkit-transform: scale(0); }
+}
+@-o-keyframes bounceOut {
+	0% { -o-transform: scale(1); }
+	70% { -o-transform: scale(1.03); }
+	100% { -o-transform: scale(0); }
+}
+@-moz-keyframes bounceOut {
+	0% { -moz-transform: scale(1); }
+	70% { -moz-transform: scale(1.03); }
+	100% { -moz-transform: scale(0); }
+}
+@keyframes bounceOut {
+	0% { transform: scale(1); }
+	70% { transform: scale(1.03); }
+	100% { transform: scale(0); }
+}
+.ui-animate-fadeIn { display: block !important; -webkit-animation: fadeIn .2s linear; -o-animation: fadeIn .2s linear; animation: fadeIn .2s linear; }
+@-webkit-keyframes fadeIn {
+	0% { opacity: 0; }
+	100% { opacity: .5; }
+}
+@-o-keyframes fadeIn {
+	0% { opacity: 0; }
+	100% { opacity: .5; }
+}
+@-moz-keyframes fadeIn {
+	0% { opacity: 0; }
+	100% { opacity: .5; }
+}
+@keyframes fadeIn {
+	0% { opacity: 0; }
+	100% { opacity: .5; }
+}
+.ui-animate-fadeOut { -webkit-animation: fadeOut .2s linear; -o-animation: fadeOut .2s linear; animation: fadeOut .2s linear; }
+@-webkit-keyframes fadeOut {
+	0% { opacity: .5; }
+	100% { opacity: 0; }
+}
+@-o-keyframes fadeOut {
+	0% { opacity: .5; }
+	100% { opacity: 0; }
+}
+@-moz-keyframes fadeOut {
+	0% { opacity: .5; }
+	100% { opacity: 0; }
+}
+@keyframes fadeOut {
+	0% { opacity: .5; }
+	100% { opacity: 0; }
+}

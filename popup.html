@@ -7,7 +7,7 @@
 	<style>
 	* {margin: 0;padding: 0;}
 	/*body {width: 100%;height: 100%;}*/
-	.popbox-container_ {background: #fff;font-size: 14px;z-index: 15;}
+	.popbox-container_ {background: #fff;font-size: 14px;}
 	.pop-header {height: 30px;background: #fff;border-bottom: 1px solid #cdcdcd;text-align: right;}
 	.pop-header strong {float: left;padding-left: 14px;font-size: 14px;line-height: 28px;font-family: 微软雅黑;}
 	.pop-header-close,.pop-section-ico {background: url(http://www1.pcauto.com.cn/cmt/2013/images/cmtIcon.png) no-repeat;}
@@ -42,6 +42,7 @@
 		},
 		// overlay: true,
 		dragable: true,
+		// animate: false,
 		style: {
 			width: '500px',
 			border: '1px solid red'
@@ -109,25 +110,6 @@
 			}
 		}
 	})
-	// var pop3 = new Popbox({
-	// 	type: 'tip',
-	// 	direction: 'bottom',
-	// 	el: function(){
-	// 		return '<div>hello<span data-event="popClose"> x </span></div>'
-	// 	},
-	// 	style: {
-	// 		width: '100px',
-	// 		height: '50px',
-	// 		'text-align': 'center',
-	// 		color: 'red'
-	// 	}
-	// })
-	// document.getElementById('showPop').onclick = function(e){
-	// 	pop3.show(e,{
-	// 		border: '1px solid red',
-	// 		'line-height': '50px'
-	// 	});
-	// }
 	setTimeout(function(){
 		var node = document.createElement('div');
 		node.innerHTML = '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>';

@@ -158,6 +158,30 @@
 		}
 	}
 
+	var supportAnimationEnd = (function(){
+		var prefix = {
+			'webkit': 'webkitAnimationEnd',
+			'Moz': 'animationend',
+			'ms': 'MSAnimationEnd',
+			'O': 'animationend'
+		},
+		elStyle = document.createElement('div').style,
+		ret = false;
+		for(var i in prefix){
+			if(prefix.hasOwnProperty(i)){
+				if(i + 'Animation' in elStyle){
+					ret = prefix[i];
+					break;
+				}
+			}
+		}
+		// fallback to standard
+		if(!ret && 'animation' in elStyle){
+			ret = 'animationend';
+		}
+		return ret;
+	})()
+
 	var overlayIndex = popMaxzIndex = 9998;
 
 	var instances = [];
@@ -168,17 +192,68 @@
 
 	var hasBindResize = false;
 
+	
+	var css = (function(){
+		var map = {
+			hide: 'none',
+			show: ''
+		};
+		var css = {};
+		for(var i in map){
+			if(map.hasOwnProperty(i)){
+				css[i] = (function(display){
+					if(supportAnimationEnd){
+						return function(el,className,callback,context){
+							el.animationend = function(){
+								callback && callback.call(context);
+								this.classList.remove(className);
+								this.style.display = display;
+								removeEvent(this, supportAnimationEnd, this.animationend);
+								this.animationend = null;
+
+							}
+							addEvent(el,supportAnimationEnd,el.animationend);
+							el.classList.add(className);
+						}
+					}else{
+						return function(el,className,callback,context){
+							el.style.display = display;
+							callback && callback.call(context);
+						}
+					}
+				})(map[i])
+			}
+		}
+		return css;
+	})();
+
+	var loadStylesheet = (function(){
+		var cssText = '.ui-animate-bounceIn{display:block!important;-webkit-animation:bounceIn .2s linear;-o-animation:bounceIn .2s linear;-moz-animation:bounceIn .2s linear;animation:bounceIn .2s linear}@-webkit-keyframes bounceIn{0%{-webkit-transform:scale(.5);opacity:0}70%{-webkit-transform:scale(1.03)}100%{-webkit-transform:scale(1)}}@-o-keyframes bounceIn{0%{-o-transform:scale(.5);opacity:0}70%{-o-transform:scale(1.03)}100%{-o-transform:scale(1)}}@-moz-keyframes bounceIn{0%{-moz-transform:scale(.5);opacity:0}70%{-moz-transform:scale(1.03)}100%{-moz-transform:scale(1)}}@keyframes bounceIn{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.03)}100%{transform:scale(1)}}.ui-animate-bounceOut{-webkit-animation:bounceOut .2s linear;-o-animation:bounceOut .2s linear;animation:bounceOut .2s linear}@-webkit-keyframes bounceOut{0%{-webkit-transform:scale(1)}70%{-webkit-transform:scale(1.03)}100%{-webkit-transform:scale(0)}}@-o-keyframes bounceOut{0%{-o-transform:scale(1)}70%{-o-transform:scale(1.03)}100%{-o-transform:scale(0)}}@-moz-keyframes bounceOut{0%{-moz-transform:scale(1)}70%{-moz-transform:scale(1.03)}100%{-moz-transform:scale(0)}}@keyframes bounceOut{0%{transform:scale(1)}70%{transform:scale(1.03)}100%{transform:scale(0)}}.ui-animate-fadeIn{display:block!important;-webkit-animation:fadeIn .2s linear;-o-animation:fadeIn .2s linear;animation:fadeIn .2s linear}@-webkit-keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}@-o-keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}@-moz-keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}@keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}.ui-animate-fadeOut{-webkit-animation:fadeOut .2s linear;-o-animation:fadeOut .2s linear;animation:fadeOut .2s linear}@-webkit-keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}@-o-keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}@-moz-keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}@keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}'
+		var styleTag = document.createElement('style');
+		if(styleTag.styleSheet){
+			styleTag.styleSheet = cssText
+		}else{
+			styleTag.innerHTML = cssText;
+		}
+		var done = false;
+		return function(){
+			if(done){return}
+			done = true;
+			document.getElementsByTagName('head')[0].appendChild(styleTag);
+		}
+	})();
+
 	function Popbox(config) {
 		var wrap = this.el = document.createElement('div');
-		var self = this;
 		var defaultEvent = {
 			'click#popClose': function(e, el) {
-				self.close();
+				this.close();
 			}
 		};
 		this.zIndex = ++popMaxzIndex;
 		this.config = config || {};
 		this.config.dragable && this.bindDragEvent(defaultEvent);
+		this.useAnimate = true;
 		this.events = this.config.events && merge(defaultEvent, config.events) || defaultEvent;
 		wrap.className = 'popbox-container_';
 		wrap.style.cssText += ';position: fixed;_position: absolute;display: none;top: 50%;left: 50%;z-index: ' + this.zIndex;
@@ -190,6 +265,11 @@
 			el: this.el,
 			zIndex: this.zIndex
 		})
+		if(config.animate === false){
+			this.useAnimate = false;
+		}else{
+			loadStylesheet();
+		}
 		this.config.overlay !== false && this.buildOverlay();
 		this.config.shortcut = config.shortcut || false;
 		this.bind();
@@ -276,20 +356,31 @@
 		close: function(callback) {
 			// cssText += ';display..' cannot hide select element in ie6
 			this.toggleOverlay(false);
-			this.el.style.display = 'none';
-			callback && callback.call(this);
+			if(this.useAnimate){
+				css.hide(this.el,'ui-animate-bounceOut',callback,this);
+			}else{
+				this.el.style.display = 'none';
+				callback && callback.call(this);
+			}
 			return this;
 		},
 		show: function(callback) {
 			this.toggleOverlay(true);
-			this.el.style.display = 'block';
+			if(this.useAnimate){
+				css.show(this.el,'ui-animate-bounceIn',callback,this);
+			}else{
+				this.el.style.display = 'block';
+				callback && callback.call(this);
+			}
 			this.layoutFix();
-			callback && callback.call(this);
 			return this;
 		},
 		remove: function() {
-			document.body.removeChild(this.el);
-			this.overlayEl && document.body.removeChild(this.overlayEl);
+			var self = this;
+			this.close(function(){
+				document.body.removeChild(self.el);
+				self.overlayEl && document.body.removeChild(self.overlayEl);
+			})
 		},
 		buildOverlay: function() {
 			this.overlayEl = overlay = document.createElement('div');
@@ -304,10 +395,18 @@
 			}
 			if (this.overlayEl) {
 				if (show === true) {
-					this.overlayEl.style.cssText += ';display: block';
+					if(this.useAnimate){
+						css.show(this.overlayEl,'ui-animate-fadeIn',null,this);
+					}else{
+						this.overlayEl.style.display = 'block';
+					}
 					resizeOverlay(this.overlayEl);
 				} else {
-					this.overlayEl.style.cssText += ';display: none';
+					if(this.useAnimate){
+						css.hide(this.overlayEl,'ui-animate-fadeOut',null,this);
+					}else{
+						this.overlayEl.style.display = 'none';
+					}
 				}
 			}
 			if (!hasBindResize) {
