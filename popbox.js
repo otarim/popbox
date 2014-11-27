@@ -15,7 +15,7 @@
 		return 'dataset' in el ? (el.dataset[property] = value) : (el.setAttribute('data-' + property, value))
 	}
 	var eventHub = {};
-	var isIE = !-[1, ];
+	var isIE = typeof addEventListener !== 'function';
 	var specialTypes = {
 		mouseenter: {
 			type: 'mouseover',
@@ -182,6 +182,8 @@
 		return ret;
 	})()
 
+	var isIE6 = typeof window.XMLHttpRequest === 'undefined';
+
 	var overlayIndex = popMaxzIndex = 9998;
 
 	var instances = [];
@@ -228,10 +230,12 @@
 	})();
 
 	var loadStylesheet = (function(){
-		var cssText = '.ui-animate-bounceIn{display:block!important;-webkit-animation:bounceIn .2s linear;-o-animation:bounceIn .2s linear;-moz-animation:bounceIn .2s linear;animation:bounceIn .2s linear}@-webkit-keyframes bounceIn{0%{-webkit-transform:scale(.5);opacity:0}70%{-webkit-transform:scale(1.03)}100%{-webkit-transform:scale(1)}}@-o-keyframes bounceIn{0%{-o-transform:scale(.5);opacity:0}70%{-o-transform:scale(1.03)}100%{-o-transform:scale(1)}}@-moz-keyframes bounceIn{0%{-moz-transform:scale(.5);opacity:0}70%{-moz-transform:scale(1.03)}100%{-moz-transform:scale(1)}}@keyframes bounceIn{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.03)}100%{transform:scale(1)}}.ui-animate-bounceOut{-webkit-animation:bounceOut .2s linear;-o-animation:bounceOut .2s linear;animation:bounceOut .2s linear}@-webkit-keyframes bounceOut{0%{-webkit-transform:scale(1)}70%{-webkit-transform:scale(1.03)}100%{-webkit-transform:scale(0)}}@-o-keyframes bounceOut{0%{-o-transform:scale(1)}70%{-o-transform:scale(1.03)}100%{-o-transform:scale(0)}}@-moz-keyframes bounceOut{0%{-moz-transform:scale(1)}70%{-moz-transform:scale(1.03)}100%{-moz-transform:scale(0)}}@keyframes bounceOut{0%{transform:scale(1)}70%{transform:scale(1.03)}100%{transform:scale(0)}}.ui-animate-fadeIn{display:block!important;-webkit-animation:fadeIn .2s linear;-o-animation:fadeIn .2s linear;animation:fadeIn .2s linear}@-webkit-keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}@-o-keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}@-moz-keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}@keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}.ui-animate-fadeOut{-webkit-animation:fadeOut .2s linear;-o-animation:fadeOut .2s linear;animation:fadeOut .2s linear}@-webkit-keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}@-o-keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}@-moz-keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}@keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}'
+		var cssText = '.ui-animate-bounceIn{display:block!important;-webkit-animation:bounceIn .2s linear;-o-animation:bounceIn .2s linear;-moz-animation:bounceIn .2s linear;animation:bounceIn .2s linear}@-webkit-keyframes bounceIn{0%{-webkit-transform:scale(.5);opacity:0}70%{-webkit-transform:scale(1.03)}100%{-webkit-transform:scale(1)}}@-o-keyframes bounceIn{0%{-o-transform:scale(.5);opacity:0}70%{-o-transform:scale(1.03)}100%{-o-transform:scale(1)}}@-moz-keyframes bounceIn{0%{-moz-transform:scale(.5);opacity:0}70%{-moz-transform:scale(1.03)}100%{-moz-transform:scale(1)}}@keyframes bounceIn{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.03)}100%{transform:scale(1)}}.ui-animate-bounceOut{-webkit-animation:bounceOut .2s linear;-o-animation:bounceOut .2s linear;animation:bounceOut .2s linear}@-webkit-keyframes bounceOut{0%{-webkit-transform:scale(1)}70%{-webkit-transform:scale(1.03)}100%{-webkit-transform:scale(0)}}@-o-keyframes bounceOut{0%{-o-transform:scale(1)}70%{-o-transform:scale(1.03)}100%{-o-transform:scale(0)}}@-moz-keyframes bounceOut{0%{-moz-transform:scale(1)}70%{-moz-transform:scale(1.03)}100%{-moz-transform:scale(0)}}@keyframes bounceOut{0%{transform:scale(1)}70%{transform:scale(1.03)}100%{transform:scale(0)}}.ui-animate-fadeIn{display:block!important;-webkit-animation:fadeIn .2s linear;-o-animation:fadeIn .2s linear;animation:fadeIn .2s linear}@-webkit-keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}@-o-keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}@-moz-keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}@keyframes fadeIn{0%{opacity:0}100%{opacity:.5}}.ui-animate-fadeOut{-webkit-animation:fadeOut .2s linear;-o-animation:fadeOut .2s linear;animation:fadeOut .2s linear}@-webkit-keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}@-o-keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}@-moz-keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}@keyframes fadeOut{0%{opacity:.5}100%{opacity:0}}';
 		var styleTag = document.createElement('style');
+		// needed in ie
+		styleTag.setAttribute('type', 'text/css');
 		if(styleTag.styleSheet){
-			styleTag.styleSheet = cssText
+			styleTag.styleSheet.cssText = cssText;
 		}else{
 			styleTag.innerHTML = cssText;
 		}
@@ -446,19 +450,14 @@
 			defaultEvent['mousedown#popDrag'] = dragEventFn;
 		},
 		layoutFix: function() {
-			var offX, offY;
-			if (!-[1, ] || this.config.dragable) {
-				offX = -this.el.offsetWidth / 2 + 'px';
+			var offX = -this.el.offsetWidth / 2 + 'px';
 				offY = -this.el.offsetHeight / 2 + 'px';
-				if (!-[1, ] && !window.XDomainRequest) {
+				if (isIE6) {
 					this.el.style.cssText += ';top: ' + getViewLayout().height + 'px;left: ' + getViewLayout().width + 'px;';
 				} else {
 					this.el.style.cssText += ';top: 50%;left: 50%;';
 				}
 				this.el.style.cssText += ';margin-top: ' + offY + ';margin-left: ' + offX;
-			} else {
-				this.el.style.cssText += addPrefix('transform', 'translate(-50%,-50%)');
-			}
 		}
 	}
 	exports.Popbox = Popbox;
