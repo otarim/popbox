@@ -260,7 +260,10 @@
 		this.useAnimate = true;
 		this.events = this.config.events && merge(defaultEvent, config.events) || defaultEvent;
 		wrap.className = 'popbox-container_';
-		wrap.style.cssText += ';position: fixed;_position: absolute;display: none;top: 50%;left: 50%;z-index: ' + this.zIndex;
+		wrap.style.cssText += ';position: fixed;display: none;top: 50%;left: 50%;z-index: ' + this.zIndex;
+		if(isIE6){
+			wrap.style.position = 'absolute';
+		}
 		this.config.style && (wrap.style.cssText += coStyle(config.style));
 		wrap.innerHTML = this.config.el && config.el.call(this, this.el) || '';
 		document.body.insertBefore(wrap, document.body.firstChild);
