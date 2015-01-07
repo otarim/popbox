@@ -182,7 +182,7 @@
 		return ret;
 	})()
 
-	var isIE6 = typeof window.XMLHttpRequest === 'undefined';
+	var isIE6 = typeof window.XMLHttpRequest === 'undefined'; //ie78 return 'object'
 
 	var overlayIndex = popMaxzIndex = 9998;
 
