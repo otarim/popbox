@@ -32,7 +32,7 @@
 
 	返回弹窗的结构（不包含最外层container标签）
 	
-**event**
+**events**
 	
 	方法名#data-event属性的值，事件代理在最外层元素，支持 focus 以及 blur 冒泡
 	e: 事件源
